@@ -9,6 +9,10 @@ $(function() {
 		galID = $slideshow.attr('data-gal-id'),
 		$slides = $slideshow.find('.slides');
 
+		if(isNaN(galID)){
+			return;
+		}
+
 		$.ajax({
 			url: baseURL + 'page/loadSlides/'+galID,
 			success: function(data) {

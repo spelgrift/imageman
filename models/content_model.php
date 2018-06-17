@@ -14,16 +14,18 @@ class Content_Model extends Model {
 	
 	/**
 	 *	getPageContent - Returns array of content attributes
-	 *	@param string $pageid 
+	 *	@param string $pageID 
+	 *	@param string $type - whether request came from page or post
 	 *	@return array
 	 *
 	 */
-	public function getPageContent($pageid = false)
+	public function getPageContent($pageID = false, $type = 'page')
 	{
-		if($pageid) // PageID passed, get content for that page
+		if($pageID) // PageID passed, get content for that page
 		{
-			$query = "SELECT contentID, url, type, position, bootstrap FROM content WHERE parentPageID = :parentPageID AND hidden = 0 AND trashed = 0 AND orphaned = 0 ORDER BY position ASC";
-			$dbArray = array(':parentPageID' => $pageid);
+			$typeID = "parent".ucfirst($type)."ID";
+			$query = "SELECT contentID, url, type, position, bootstrap FROM content WHERE $typeID = :parentPageID AND hidden = 0 AND trashed = 0 AND orphaned = 0 ORDER BY position ASC";
+			$dbArray = array(':parentPageID' => $pageID);
 		}
 		else // No PageID, get content for homepage
 		{
@@ -95,7 +97,7 @@ class Content_Model extends Model {
 		return $this->_getContentArrayRecursive($type, "0");
 	}
 
-	private function _getContentArrayRecursive($type, $parentPageID, $path = "")
+	private function _getContentArrayRecursive($type, $parentPageID, $path = "", $parentType = 'page')
 	{
 		// Build WHERE clause based on type
 		if($type === 'all')
@@ -108,7 +110,8 @@ class Content_Model extends Model {
 				'video',
 				'text',
 				'embeddedVideo',
-				'shortcut'
+				'shortcut',
+				'post'
 			);
 		} else if(is_string($type)) {
 			$type = array($type);
@@ -118,31 +121,44 @@ class Content_Model extends Model {
 			$where .= "type = '$str' OR ";
 		}
 		$where = rtrim($where, 'OR ') . " ";
+		$parentTypeID = 'parent'.ucfirst($parentType).'ID';
 
 		// If pages are included in the requested types, group content by parent page
 		if(in_array('page', $type))
 		{
-			$parentCondition = "AND parentPageID = $parentPageID";
+			$parentCondition = "AND $parentTypeID = $parentPageID";
 		} else {
 			$parentCondition = "";
 		}
 		// Create empty array
 		$returnArray = array();
 		// Get content results from DB
-		if($result = $this->db->select("SELECT contentID, url, type, parentPageID, author, `date` FROM content WHERE trashed = '0' $parentCondition AND ( $where ) ORDER BY contentID DESC"))
+		if($result = $this->db->select("SELECT contentID, url, type, parentPageID, parentPostID, author, `date` FROM content WHERE trashed = '0' $parentCondition AND ( $where ) ORDER BY contentID DESC"))
 		{
+			// Get blog posts if this is the top level
+			if($parentPageID == '0' AND $blogResult = $this->db->select("SELECT contentID, url, type, author, `date` FROM content WHERE trashed = '0' AND type = 'post' ORDER BY contentID DESC"))
+			{
+				$result = array_merge($result, $blogResult);
+			}
+			// echo "<pre>";
+			// print_r($result);
+			// echo "</pre>";
 			foreach($result as $row)
 			{
+				
 				// Add attributes common to all types
 				$typeArray = array(
 					'contentID' => $row['contentID'],
 					'type' => $row['type'],
-					'parentPageID' => $row['parentPageID'],
 					'date' => $row['date'],
-					'author' => $row['author']
+					'author' => $row['author'],
+					'parentType' => $parentType
 				);
 				// Switch by type
 				$thisType = $row['type'];
+				if($thisType !== "post"){
+					$typeArray['parentPageID'] = $row[$parentTypeID];
+				}
 				switch($thisType)
 				{
 					case "page":
@@ -150,11 +166,13 @@ class Content_Model extends Model {
 					case "video" :
 						// Append trailing / to path if item has a parent page
 						if(strlen($path) > 0) {	
-							$path = $path . "/";	
+							$thisPath = $path . "/";	
+						} else {
+							$thisPath = $path;
 						}
 						// Create/save path + url
 						$typeArray['url'] = $row['url'];
-						$typeArray['path'] = $path . $row['url'];
+						$typeArray['path'] = $thisPath . $row['url'];
 
 						$query = "SELECT ".$thisType."ID, name FROM ".$thisType." WHERE contentID = :contentID";
 						$result = $this->db->select($query, array(':contentID' => $row['contentID']));
@@ -200,11 +218,24 @@ class Content_Model extends Model {
 						$typeArray['singleImageID'] = $result[0]['singleImageID'];
 						$typeArray['name'] = $result[0]['name'];
 					break;
+					case "post" :
+						$typeArray['url'] = $row['url'];
+						$typeArray['path'] = 'blog/post/'.$row['url'];
+
+						$result = $this->db->select("SELECT postID, title FROM post WHERE contentID = '".$row['contentID']."'");
+						$typeArray['name'] = $result[0]['title'];
+						// Get post content
+						$typeArray['subContent'] = $this->_getContentArrayRecursive('all', $result[0]['postID'], $typeArray['path'], 'post');
+
+					break;
 				}
 
 				$returnArray[] = $typeArray;
 			}
 		}
+		// echo "<pre>";
+		// print_r($returnArray);
+		// echo "</pre>";
 		return $returnArray;
 	}
 
@@ -677,7 +708,7 @@ class Content_Model extends Model {
 
 	protected function _makeURL($str)
 	{
-		$url = preg_replace('#[^a-z.0-9_]#i', '_', $str);
+		$url = preg_replace('#[^a-z.0-9_]#i', '-', $str);
 		return strtolower($url);
 	}
 
@@ -716,7 +747,7 @@ class Content_Model extends Model {
 			return false;
 		}
 		// Make sure URL uses correct characters
-		$url = preg_replace('#[^a-z.0-9_]#i', '_', $url);
+		$url = $this->_makeURL($url);
 
 		// Make sure name/URL are not taken
 		$query = "SELECT * FROM content WHERE url = :url";
@@ -842,12 +873,14 @@ class Content_Model extends Model {
 		return true;
 	}
 
-	protected function _advanceContentPositions($parentPageID = 0, $home = 0)
+	protected function _advanceContentPositions($parentID = 0, $home = 0, $type = 'page')
 	{
+		$typeID = "parent".ucfirst($type)."ID";
 		if($home === 0) {
-			$query = "SELECT position, contentID FROM content WHERE parentPageID = '".$parentPageID."'";
+			$query = "SELECT position, contentID FROM content WHERE $typeID = '".$parentID."'";
 		} else {
 			$query = "SELECT position, contentID FROM content WHERE frontpage = 1";
+			
 		}
 		if ($result = $this->db->select($query))
 		{

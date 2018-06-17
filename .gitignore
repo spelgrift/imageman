@@ -46,6 +46,7 @@ Thumbs.db
 # User Uploaded Images #
 ########################
 test/*.*
+uploads/
 uploads/*.jpg
 uploads/*.gif
 uploads/*.png

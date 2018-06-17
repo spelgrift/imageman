@@ -4369,6 +4369,7 @@ button.close {
 }
 #adminNav.navbar {
   margin-bottom: 0px;
+  border-bottom: 4px solid #d47b2f;
 }
 .inverse-dropdown {
   background-color: #222;
@@ -4492,6 +4493,9 @@ footer .footer-above {
 #mainNav a.navLinkControl:hover {
   color: #555;
 }
+#contentArea {
+  border: 1px dashed #7d7d7d;
+}
 #contentArea .contentPlaceholder {
   padding: 50px;
   text-align: center;
@@ -4500,11 +4504,12 @@ footer .footer-above {
 }
 .contentItem {
   background-color: white;
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   position: relative;
 }
 .contentItem.editContent .content {
-  border: 1px dashed #333;
+  border: 1px dotted #c3c3c3;
   min-height: 32px;
 }
 .contentItem.spacer {
@@ -4962,6 +4967,71 @@ footer .footer-above {
 }
 .slideshow:hover .slideControlBar {
   opacity: 1;
+}
+.blog-input {
+  border: 1px dashed #7d7d7d;
+  padding: 5px;
+}
+#blogTextInput {
+  min-height: 300px;
+}
+.blogDate {
+  color: #adadad;
+}
+.blogPost {
+  margin-bottom: 40px;
+}
+.blogPost h2 {
+  margin-top: 10px;
+}
+.blogPost h2 a {
+  text-transform: uppercase;
+  color: #333;
+}
+.blogPost h2 a:hover {
+  text-decoration: none;
+  color: #666;
+}
+.blogPost:after {
+  content: '';
+  display: block;
+  width: 40%;
+  height: 40px;
+  border-bottom: 1px solid #eee;
+  margin: 0 auto;
+}
+#postList td {
+  text-align: center;
+}
+#postList td.listName {
+  font-weight: bold;
+}
+.postContent {
+  margin-top: 10px;
+}
+.modal-content {
+  border-radius: 8px;
+}
+.modal-header {
+  background-color: #222;
+  color: #9d9d9d;
+  border-bottom: 4px solid #d47b2f;
+  border-radius: 3px 3px 0 0;
+}
+.modal-header .close {
+  margin-top: -4px;
+  font-size: 30px;
+  font-weight: normal;
+  color: white;
+  text-shadow: none;
+}
+.modal-header .close:hover {
+  color: white;
+}
+@media (min-width: 768px) {
+  .modal-dialog {
+    margin: 80px auto;
+  }
 }
 .shortcut {
   width: 100%;

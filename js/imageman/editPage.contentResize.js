@@ -2,9 +2,18 @@ var $ = require('jquery');
 var _ = require('./utilityFunctions.js'); // helper functions
 
 $(function() {
-	var $contentArea = $('#contentArea');
-	var pageURL = _.getURL();
-	var currentScreen;
+
+	// Page or Post?
+	var isPost = false,
+	postID = "";
+	if((window.location.href).includes(baseURL+"blog/")) { 
+		isPost = true;
+		postID = $('#adminNav').attr('data-id');
+	}
+
+	var $contentArea = $('#contentArea'),
+	pageURL = baseURL+"page",
+	currentScreen;
 
 	// Config
 	var minColWidth = 3,

@@ -39,7 +39,10 @@ var utilityFunctions = (function() {
 		});
 	};
 
-	var getURL = function(){
+	var getURL = function(isPost){
+		if(isPost){
+			return window.baseURL + 'blog';
+		}
 		if(window.baseURL === $('a#viewTab').attr('href')){
 			return window.baseURL + 'page';
 		} else {
