@@ -13,6 +13,8 @@ $(function() {
 		skin_url: baseURL+'public/css',
 		theme: 'inlite',
 		inline: true,
+		plugins: "paste",
+		paste_as_text: true,
 		selection_toolbar: '',
 		insert_toolbar: '',
 		init_instance_callback: function(editor) {
@@ -25,6 +27,8 @@ $(function() {
 		skin_url: baseURL+'public/css',
 		theme: 'inlite',
 		inline: true,
+		plugins: "paste",
+		paste_as_text: true,
 		selection_toolbar: 'bold italic | alignleft aligncenter alignright alignjustify | quicklink h1 h2 h3',
 		insert_toolbar: '',
 		init_instance_callback: function(editor) {
@@ -52,7 +56,7 @@ $(function() {
  	pendingChanges = false;
 
  	// Determine if this is a new post or editing an old one
- 	if((window.location.href).includes("blog/newpost")) {
+ 	if((window.location.href).includes(blogURL+"/newpost")) {
  		isNew = true;
  		pendingChanges = true;
  	} else {
@@ -76,6 +80,7 @@ $(function() {
  	$publishTab.click(publishPost);
  	$trashTab.click(trashPost);
  	$(window).on('beforeunload', confirmUnsavedChanges);
+ 	events.on('newText', reInit);
 
 /**
  * 
@@ -95,21 +100,21 @@ $(function() {
  			'title' : tinymce.get('blogTitleInput').getContent(),
  			'body' : tinymce.get('blogBodyInput').getContent()
  		},
- 		url = baseURL + 'blog/publishPost/'+contentID;
+ 		url = baseURL + blogURL +'/publishPost/'+contentID;
  		_.post(url, data, submitBlogSuccess, submitBlogError);	
  	}
 
  	function submitBlogSuccess(data) {
+		pendingChanges = false;
 		// If this is a new post, redirect to the blog mainpage to see the new post in action
 		if(isNew){
-			window.location.replace(baseURL+'blog/');
+			window.location.replace(baseURL+blogURL+'/');
 		} else {
 			_.error("<p class='bg-success'>Changes saved!</p>", $msg);
 			// Update view link and window URL
 			$viewTab.attr('href', data.viewPath);
 			document.title = data.pageTitle;
 			window.history.replaceState({}, data.title, data.windowPath);
-			pendingChanges = false;
 		}
 	}
 
@@ -129,7 +134,7 @@ $(function() {
 			success: function(data) {
 				if(!data.error) {
 					pendingChanges = false;
-					window.location.replace(baseURL+'blog/manage/');
+					window.location.replace(baseURL+blogURL+'/manage/');
 				}
 			}
 		});
@@ -151,6 +156,14 @@ $(function() {
 
  	function madeChanges(){
  		pendingChanges = true;
+ 	}
+
+ 	function reInit(){
+ 		setTimeout(function(){
+ 			tinymce.init(titleInputConfig);
+			tinymce.init(bodyInputConfig);
+ 		},50);
+ 		
  	}
 
 });

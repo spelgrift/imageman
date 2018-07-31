@@ -22,6 +22,6 @@
 
 <? if(!$this->newPost): ?>
 <li>
-	<a id='viewTab' href='<? echo URL."blog/post/".$this->postAttr['url']; ?>'><i class='fa fa-fw fa-desktop'></i> View Post</a>
+	<a id='viewTab' href='<? echo URL.BLOGURL."/post/".$this->postAttr['url']; ?>'><i class='fa fa-fw fa-desktop'></i> View Post</a>
 </li>
 <? endif; ?>

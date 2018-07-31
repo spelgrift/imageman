@@ -25,11 +25,13 @@
 		<i class='fa fa-fw fa-home'></i> Edit Homepage
 	</a>
 </li>
+<? if(BLOG_ENABLED): ?>
 <li>
-	<a href='<?php echo URL; ?>blog/manage/'>
+	<a href='<?php echo URL.BLOGURL; ?>/manage/'>
 		<i class='fa fa-pencil-square-o'></i> Manage Blog
 	</a>
 </li>
+<? endif; ?>
 <?php if (Session::get('role') == 'owner'): ?>
 	<li><a href='<?php echo URL; ?>user'><i class="fa fa-users"></i> Users</a></li>
 <?php endif; ?>

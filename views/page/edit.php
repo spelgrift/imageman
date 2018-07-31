@@ -9,15 +9,18 @@ require 'views/inc/addContentForms/addImage.php';
 require 'views/inc/addContentForms/addSpacer.php';
 require 'views/inc/content/adminControls/contentControls.php';
 require 'views/inc/content/shortcut/shortcutSettings.php';
+require 'views/inc/content/singleImage/singleImageSettings.php';
 require 'views/inc/content/slideshow/slideshowSettings.php';
 require 'views/inc/content/text/editHTML.php';
 
-// If homepage, render custom html ('views/custom/home.php') before normal content (if it exists)
+// If homepage, render custom html ('views/custom/home.php') before normal content (if it exists). If other custom file exists with a filename that matches the page url, render that instead.
 if($this->pageAttr['home']){
 	$customFile = 'views/custom/home.php';
-	if(file_exists($customFile)){
-		require $customFile;
-	}
+} else {
+	$customFile = 'views/custom/'.$this->pageAttr['url'].'.php';
+}
+if(file_exists($customFile)){
+	require $customFile;
 }
 
 // If Home-type is set to 'normal', show content area like normal. Otherwise hide it and show settings only.

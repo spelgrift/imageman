@@ -366,6 +366,21 @@ class Page extends Controller
 		$this->textContentModel->updateText($contentID);
 	}
 
+	public function updateSingleImgURL($contentID)
+	{
+		Auth::setAccess();
+		$this->_loadTypeContentModel('image');
+		$this->imageContentModel->updateURL($contentID);
+	}
+
+	public function updateSingleImg($contentID)
+	{
+		Auth::setAccess();
+		$this->_loadTypeContentModel('image');
+		$filename = isset($this->_pageAttrArray['url']) ? $this->_pageAttrArray['url'] : 'home';
+		$this->imageContentModel->updateSingleImage($contentID, $filename);
+	}
+
 /**
  *
  *	EDIT GALLERY METHODS

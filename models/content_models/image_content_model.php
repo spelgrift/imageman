@@ -31,7 +31,7 @@ class Image_Content_Model extends Content_Model {
 		if($orientation == 'portrait' || $orientation == 'square') {
 			$bootstrap = 'col-xs-12 col-sm-6';
 			if($type === 'post'){
-				$bootstrap = 'col-xs-6 col-sm-4';
+				$bootstrap = 'col-xs-12 col-sm-4';
 			}
 		} else {
 			$bootstrap = 'col-xs-12';
@@ -57,17 +57,65 @@ class Image_Content_Model extends Content_Model {
 			'lgVersion' => $lgVersion,
 			'orientation' => $orientation
 		));
+		$singleImageID = $this->db->lastInsertId();
 
 		// Success!
 		$results = array(
 			'error' => false,
 			'results' => array(
 				'contentID' => $contentID,
+				'singleImageID' => $singleImageID,
 				'bootstrap' => $bootstrap,
 				'smVersion' => $smVersion,
 				'lgVersion' => $lgVersion
 			)
 		);
 		echo json_encode($results);	
+	}
+
+	// Replace image
+	public function updateSingleImage($contentID, $filename)
+	{
+		if(!$image = $this->_saveOriginalImage($_FILES)) {
+			return false;
+		}
+		// Delete old image display versions
+		$this->_deleteSingleImgFiles($contentID);
+
+		$original = $image['original'];
+		$fileName = $image['fileName'];
+		$fileExt = $image['fileExt'];
+
+		// Resize to display versions
+		$baseName = $filename . "_" . date("Ymd-his") . "_";
+		$smVersion = UPLOADS . $baseName . "sm." . $fileExt;
+		$lgVersion = UPLOADS . $baseName . "lg." . $fileExt;
+		Image::makeDisplayImgs($original, $smVersion, $lgVersion);
+		// Get orientation 
+		$orientation = Image::getOrientation($original);
+		// Update DB
+		$this->db->update('singleImage', array(
+			'original' => $original,
+			'smVersion' => $smVersion,
+			'lgVersion' => $lgVersion,
+			'orientation' => $orientation
+		), "`contentID` = ".$contentID);
+		$results = array(
+			'error' => false,
+			'results' => array(
+				'lgVersion' => $lgVersion
+			)
+		);
+		echo json_encode($results);
+	}
+
+	// Update image URL
+	public function updateURL($contentID)
+	{
+		$this->db->update('singleImage', array('singleImageURL' => $_POST['url']), "`contentID` = ".$contentID);
+		echo json_encode(array(
+			'error' => false,
+			'url' => $_POST['url']
+		));
 	}
 }

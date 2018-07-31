@@ -14,7 +14,7 @@ $(function() {
  	// Page or Post?
 	var isPost = false,
 	postID = "";
-	if((window.location.href).includes(baseURL+"blog/")) { 
+	if((window.location.href).includes(baseURL+blogURL+"/")) {
 		isPost = true;
 		postID = $('#adminNav').attr('data-id');
 	}

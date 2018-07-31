@@ -21,7 +21,7 @@ if(isset($this->pageAttr['pageID'])) {
 		<ul class="nav navbar-nav navbar-right">
 		<? if(isset($this->adminNav) && strpos($this->adminNav, 'post') !== false): ?>
 			<li>
-				<a href='<?php echo URL; ?>blog/manage/'><i class="fa fa-list"></i> Manage Blog</a>
+				<a href='<?php echo URL.BLOGURL; ?>/manage/'><i class="fa fa-list"></i> Manage Blog</a>
 			</li>
 		<? elseif(!isset($this->adminNav) || $this->adminNav != 'dashboard'): ?>
 			<li>

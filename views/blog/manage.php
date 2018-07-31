@@ -9,6 +9,9 @@
 			foreach($this->posts as $post) {
 				require "views/inc/blog/postListRow.php";
 			}
+			if(count($this->posts) == 0) {
+				echo "<tr class='placeholderRow'><td colspan='4'>No posts yet. Get started by clicking 'New Post'.</td></tr>";
+			}
 			?>
 		</table>
 	</div>

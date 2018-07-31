@@ -5,6 +5,10 @@ define('BRAND', 'Imageman');
 // Paths (leave on trailing /)
 define('URL', 'http://kate.sampelgrift.com/ts/imageman/');
 define('DEVPATH', '/ts/imageman/'); // Set to empty string for production
+define('BLOGURL', 'blog'); // Rename blog controller and blog model to match this
+
+// Enable/disable Blog
+define('BLOG_ENABLED', true);
 
 define('LIBS', 'libs/');
 define('UPLOADS', 'uploads/');

@@ -1,14 +1,14 @@
-<?php 
+<?php require 'views/inc/header.php'; ?>
 
-require 'views/inc/header.php'; 
-
-// echo "<pre>";
-// print_r($this->posts);
-// echo "</pre>";
-
+<div id="allPosts">
+<?
 foreach($this->posts as $post) {
 	$this->postContent = $post['content'];
 	require 'views/inc/blog/post.php';
 }
+?>
+</div>
 
-require 'views/inc/footer.php'; 
+
+
+<? require 'views/inc/footer.php'; 

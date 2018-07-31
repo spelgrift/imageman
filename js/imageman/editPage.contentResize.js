@@ -3,14 +3,6 @@ var _ = require('./utilityFunctions.js'); // helper functions
 
 $(function() {
 
-	// Page or Post?
-	var isPost = false,
-	postID = "";
-	if((window.location.href).includes(baseURL+"blog/")) { 
-		isPost = true;
-		postID = $('#adminNav').attr('data-id');
-	}
-
 	var $contentArea = $('#contentArea'),
 	pageURL = baseURL+"page",
 	currentScreen;

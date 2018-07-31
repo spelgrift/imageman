@@ -135,10 +135,13 @@ class Content_Model extends Model {
 		// Get content results from DB
 		if($result = $this->db->select("SELECT contentID, url, type, parentPageID, parentPostID, author, `date` FROM content WHERE trashed = '0' $parentCondition AND ( $where ) ORDER BY contentID DESC"))
 		{
-			// Get blog posts if this is the top level
-			if($parentPageID == '0' AND $blogResult = $this->db->select("SELECT contentID, url, type, author, `date` FROM content WHERE trashed = '0' AND type = 'post' ORDER BY contentID DESC"))
+			// Get blog posts if this is the top level and posts are in the type array
+			if($parentPageID == '0' AND in_array('post', $type))
 			{
-				$result = array_merge($result, $blogResult);
+				if($parentPageID == '0' AND $blogResult = $this->db->select("SELECT contentID, url, type, author, `date` FROM content WHERE trashed = '0' AND type = 'post' ORDER BY contentID DESC"))
+				{
+					$result = array_merge($result, $blogResult);
+				}
 			}
 			// echo "<pre>";
 			// print_r($result);
@@ -317,10 +320,12 @@ class Content_Model extends Model {
 			array(
 				'templateID' => 'singleImgTemplate',
 				'type' => 'singleImage',
+				'singleImageID' => '{{singleImageID}}',
 				'contentID' => '{{contentID}}',
 				'bootstrap' => '{{bootstrap}}',
 				'smVersion' => '{{smVersion}}',
-				'lgVersion' => '{{lgVersion}}'
+				'lgVersion' => '{{lgVersion}}',
+				'singleImageURL' => ''
 			)
 		);
 	}
@@ -476,6 +481,14 @@ class Content_Model extends Model {
 			{
 				$affectedRows = $this->_orphanContent($result[0]['pageID'], $contentID, $affectedRows);
 			}
+
+			// If type is post, orphan associated content
+			$query = "SELECT postID FROM post WHERE contentID = :contentID";
+			if($result = $this->db->select($query, array(':contentID' => $contentID)))
+			{
+				$affectedRows = $this->_orphanContent($result[0]['postID'], $contentID, $affectedRows, 'post');
+			}
+
 			// If request came from dashboard, return array of affected child content to hide rows
 			if($dashboard) {
 				echo json_encode(array(
@@ -506,6 +519,10 @@ class Content_Model extends Model {
 			switch($type)
 			{
 				case 'page' :
+					// Delete cover image files
+					$this->_deleteCoverImage($type, $contentID);
+					break;
+				case 'post' :
 					// If item is a page, delete orphaned content
 					if($pageResult = $this->db->select("SELECT contentID FROM content WHERE orphanedByID = :contentID", array(':contentID' => $contentID)))
 					{
@@ -514,9 +531,7 @@ class Content_Model extends Model {
 							$this->deleteContent($row['contentID'], true);
 						}
 					}
-					// Delete cover image files
-					$this->_deleteCoverImage($type, $contentID);
-					break;
+					
 				case 'video' :
 					// Delete cover image files
 					$this->_deleteCoverImage($type, $contentID);
@@ -680,7 +695,7 @@ class Content_Model extends Model {
 		}
 	}
 
-	private function _deleteSingleImgFiles($contentID)
+	protected function _deleteSingleImgFiles($contentID)
 	{
 		if($result = $this->db->select("SELECT name, original, smVersion, lgVersion FROM singleImage WHERE contentID = :contentID", array(':contentID' => $contentID)))
 		{
@@ -892,13 +907,14 @@ class Content_Model extends Model {
 		}
 	}
 
-	protected function _orphanContent($parentPageID, $trashedID, $affectedRows)
+	protected function _orphanContent($parentPageID, $trashedID, $affectedRows, $parentType = 'page')
 	{
-		if($result = $this->db->select("SELECT contentID FROM content WHERE parentPageID = ".$parentPageID))
+		$typeID = 'parent'.ucfirst($parentType)."ID";
+		if($result = $this->db->select("SELECT contentID FROM content WHERE $typeID = ".$parentPageID))
 		{
 			foreach($result as $row)
 			{
-				// Update DB with orphaned flag, the date orphaned, and the pageID of page whose deletion started this mess ($trashedID)
+				// Update DB with orphaned flag, the date orphaned, and the contentID of page/post whose deletion started this mess ($trashedID)
 				$timestamp = date('Y-m-d H:i:s');
 				$this->db->update('content', array(
 					'orphaned' => 1,

@@ -2,20 +2,28 @@
 class Blog extends Controller {
 	function __construct() {
 		parent::__construct();
+		if(!BLOG_ENABLED){
+			$this->error();
+			return;
+		}
 		// Instantiate content model
 		$this->loadModel('content', false);
 		$this->contentModel = new Content_Model();
 	}
 
+	public $posts_at_a_time = 3;
+
 	public function index()
 	{
+		if(!BLOG_ENABLED){return;}
+
 		$this->view->pageTitle = BRAND." - Blog";
 		// Admin nav - manage blog
 		$this->view->adminNav = 'blogindex';
 		// JS - public
 		$this->view->js = array('public.min.js');
 		// Get post list and attributes from DB
-		$this->view->posts = $this->model->getPosts();
+		$this->view->posts = $this->model->getPosts(false, $this->posts_at_a_time);
 		// Add content to the array
 		$this->_loadTypeContentModel('blog');
 		$this->view->posts = $this->blogContentModel->getPostContent($this->view->posts);
@@ -23,8 +31,24 @@ class Blog extends Controller {
 		$this->view->render('blog/index');
 	}
 
+	public function loadMorePosts($lastID)
+	{
+		if(!BLOG_ENABLED){return;}
+
+		// Get post list and attributes from DB
+		$this->view->posts = $this->model->getPosts(false, $this->posts_at_a_time, $lastID);
+		// Add content to the array
+		$this->_loadTypeContentModel('blog');
+		$this->view->posts = $this->blogContentModel->getPostContent($this->view->posts);
+		// Render
+		$this->view->render('blog/loadPosts', false);
+
+	}
+
 	public function post($url = false)
 	{
+		if(!BLOG_ENABLED){return;}
+
 		if(!$url) { 
 			$this->error();
 			return false;
@@ -48,6 +72,7 @@ class Blog extends Controller {
 
 	public function manage()
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->view->pageTitle = "Manage Blog";
 		$this->view->adminNav = 'manageblog';
@@ -60,6 +85,7 @@ class Blog extends Controller {
 	}
 
 	public function newpost() {
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->view->newPost = true;
 		// Make new post in DB and get initial attributes
@@ -81,6 +107,7 @@ class Blog extends Controller {
 	}
 
 	public function editpost($url = false) {
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		if(!$url) { 
 			$this->error();
@@ -110,12 +137,14 @@ class Blog extends Controller {
 	}
 
 	public function publishPost($contentID) {
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('blog');
 		$this->blogContentModel->publishPost($contentID);
 	}
 
 	public function togglePublic($contentID) {
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->model->togglePublic($contentID);
 	}
@@ -127,6 +156,7 @@ class Blog extends Controller {
  */
 	public function addSpacer($postID)
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('page');
 		$this->pageContentModel->addSpacer($postID, 'post');
@@ -134,6 +164,7 @@ class Blog extends Controller {
 
 	public function addSingleImage($postID)
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('blog');
 		$filename = $this->blogContentModel->makeBlogImgName($postID);
@@ -143,6 +174,7 @@ class Blog extends Controller {
 
 	public function addText($postID)
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('text');
 		$this->textContentModel->addText($postID, 'post');
@@ -150,6 +182,7 @@ class Blog extends Controller {
 
 	public function addNewEV($postID)
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('video');
 		$this->videoContentModel->addVideo($postID, false, true, 'post');
@@ -157,15 +190,17 @@ class Blog extends Controller {
 
 	public function addEmbedVideo($videoID, $postID)
 	{
-	Auth::setAccess();
-	$this->_loadTypeContentModel('video');
-	if($result = $this->videoContentModel->addEmbedVideo($postID, $videoID, 'post')) {
+		if(!BLOG_ENABLED){return;}
+		Auth::setAccess();
+		$this->_loadTypeContentModel('video');
+		if($result = $this->videoContentModel->addEmbedVideo($postID, $videoID, 'post')) {
 			echo json_encode($result);
 		}
 	}
 
 	public function addSSgallery($postID)
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('gallery');
 		$this->galleryContentModel->addGallery($postID, false, true, 'post');
@@ -173,6 +208,7 @@ class Blog extends Controller {
 
 	public function addSlideshow($galID, $postID)
 	{
+		if(!BLOG_ENABLED){return;}
 		Auth::setAccess();
 		$this->_loadTypeContentModel('gallery');
 		if($result = $this->galleryContentModel->addSlideshow($postID, $galID, 'post')){

@@ -16,7 +16,13 @@ if($adminControls) {
 	
 <div class='content'>
 <?php
+if(strlen($imgURL) > 0){
+	echo "<a href='$imgURL'>";
+}
 echo "<img class='img-responsive' src='".URL.$image."'>";
+if(strlen($imgURL) > 0){
+	echo "</a>";
+}
 ?>
 	
 </div>

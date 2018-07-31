@@ -59,6 +59,8 @@ class View {
 				$text = $contentObject['text'];
 				break;
 			case 'singleImage':
+				$singleImageID = $contentObject['singleImageID'];
+				$imgURL = $contentObject['singleImageURL'];
 				$image = $contentObject[$this->_device.'Version'];
 				break;
 		}

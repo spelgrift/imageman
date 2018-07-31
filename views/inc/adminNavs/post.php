@@ -1,5 +1,5 @@
 <?php
-	$url = URL."blog/editpost/".$this->postAttr['url'];
+	$url = URL.BLOGURL."/editpost/".$this->postAttr['url'];
 ?>
 <ul class="nav navbar-nav">
 	<li>

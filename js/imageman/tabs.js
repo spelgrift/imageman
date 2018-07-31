@@ -2,8 +2,6 @@ var $ = require('jquery');
 
 $(function() {
 
-	var transitionSpeed = 200;
-
 	$('#adminNav').on('click', 'a.adminTab', adminNav);
 
 	$('body').on('click', '.tabLink', function(ev) {

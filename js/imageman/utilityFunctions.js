@@ -1,4 +1,6 @@
 var $ = require('jquery');
+require('./slideMan.js'); // Image slider
+
 var utilityFunctions = (function() {
 
 	var error = function(message, $msg, $input) {
@@ -41,7 +43,7 @@ var utilityFunctions = (function() {
 
 	var getURL = function(isPost){
 		if(isPost){
-			return window.baseURL + 'blog';
+			return window.baseURL + blogURL;
 		}
 		if(window.baseURL === $('a#viewTab').attr('href')){
 			return window.baseURL + 'page';
@@ -50,11 +52,34 @@ var utilityFunctions = (function() {
 		}
 	};
 
+	var loadSlides = function($allSlideshows){
+
+		$allSlideshows.each(function() {
+			var $slideshow = $(this),
+			galID = $slideshow.attr('data-gal-id'),
+			$slides = $slideshow.find('.slides');
+
+			if(isNaN(galID)){
+				return;
+			}
+
+			$.ajax({
+				url: baseURL + 'page/loadSlides/'+galID,
+				success: function(data) {
+					$(data).appendTo($slides).hide().fadeIn('300', function() {
+						$slideshow.slideMan();
+					});
+				}
+			});
+		});
+	};
+
 	return {
 		error : error,
 		clearMsg : clearMsg,
 		post : post,
-		getURL : getURL
+		getURL : getURL,
+		loadSlides : loadSlides
 	};
 
 })();

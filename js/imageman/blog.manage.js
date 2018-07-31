@@ -28,7 +28,7 @@ $(function() {
  		var contentID = $(this).attr('id'),
  		$thisButton = $(this);
  		$.ajax({
- 			url: baseURL+"blog/togglePublic/"+contentID,
+ 			url: baseURL+blogURL+"/togglePublic/"+contentID,
  			type: 'POST',
  			success: function(data) {
  				if(!data.error) {

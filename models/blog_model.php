@@ -35,7 +35,7 @@ class Blog_Model extends Model {
 		);
 	}
 
-	public function getPosts($withHidden = false)
+	public function getPosts($withHidden = false, $limit = false, $lastID = 999999)
 	{
 		if($withHidden) {
 			$cols = "c.contentID, c.date, c.url, c.hidden, p.postID, p.title, p.body";
@@ -44,11 +44,19 @@ class Blog_Model extends Model {
 			$cols = "c.contentID, c.date, c.url, p.postID, p.title, p.body";
 			$where = "c.trashed = 0 and c.hidden = 0 and c.type = 'post'";
 		}
+
+		if($limit) {
+			$where .= " and p.postID < $lastID";
+			$qLimit = " LIMIT $limit";
+		} else {
+			$qLimit = "";
+		}
 		$query = "SELECT $cols
 			FROM content AS c
 			LEFT JOIN post AS p ON c.contentID = p.contentID
 			WHERE $where
-			ORDER BY c.date DESC";
+			ORDER BY c.date DESC
+			$qLimit";
 		if($result = $this->db->select($query)){
 			return $result;
 		} else {
