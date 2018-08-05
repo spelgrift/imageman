@@ -8,16 +8,24 @@
 			<i class="fa fa-plus fa-fw"></i>
 		</button>
 
-		<button type='button' class='btn btn-sm btn-default resetBlock' title='Reset block'>
-			<i class="fa fa-undo fa-fw"></i>
-		</button>
-
 		<button type='button' class='btn btn-sm btn-default decreaseWidth' title='Decrease block width'>
 			<i class="fa fa-minus fa-fw"></i>
 		</button>
 		
 		<button type='button' class='btn btn-sm btn-default increaseOffset' title='Increase offset'>
 			<i class="fa fa-arrow-right fa-fw"></i>
+		</button>
+	</div><br>
+
+	<div class='btn-group' role='group'>
+		<button type='button' class='btn btn-xs btn-default blockVisibility' title='Visibility'>
+			<i class="fa fa-eye fa-fw"></i>
+		</button>
+		<button type='button' class='btn btn-xs btn-default resetBlock' title='Reset block'>
+			<i class="fa fa-undo fa-fw"></i>
+		</button>
+		<button type='button' class='btn btn-xs btn-default advancedBootstrap' title='Edit classes manually'>
+			<i class="fa fa-code fa-fw"></i>
 		</button>
 	</div><br>
 	<label>Changes affect:</label>

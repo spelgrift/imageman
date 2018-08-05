@@ -52,7 +52,7 @@ var jQuery = require('jquery');
 		function makeIteratorFunction(f, set) {
 			return function() {
 				for ( var i = 0; i < set.length; i++) {
-					set[i][f].apply(set[i][f], arguments);
+					return set[i][f].apply(set[i][f], arguments);
 				}
 			};
 		}

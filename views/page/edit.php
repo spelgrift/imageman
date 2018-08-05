@@ -8,6 +8,8 @@ require 'views/inc/addContentForms/addEmbedVideo.php';
 require 'views/inc/addContentForms/addImage.php';
 require 'views/inc/addContentForms/addSpacer.php';
 require 'views/inc/content/adminControls/contentControls.php';
+require 'views/inc/content/adminControls/resizeControls.editClass.php';
+require 'views/inc/content/adminControls/resizeControls.visibility.php';
 require 'views/inc/content/shortcut/shortcutSettings.php';
 require 'views/inc/content/singleImage/singleImageSettings.php';
 require 'views/inc/content/slideshow/slideshowSettings.php';

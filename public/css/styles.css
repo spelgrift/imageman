@@ -4495,6 +4495,7 @@ footer .footer-above {
 }
 #contentArea {
   border: 1px dashed #7d7d7d;
+  min-height: 16px;
 }
 #contentArea .contentPlaceholder {
   padding: 50px;

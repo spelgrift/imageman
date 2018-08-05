@@ -95,7 +95,8 @@ $(function() {
 					$addSpacerModal.modal('hide');
 					var newSpacerObj = {	contentID : data.results.contentID };
 					$contentArea.prepend(Mustache.render(spacerTemplate, newSpacerObj));
-					events.emit('contentAdded');
+					// events.emit('contentAdded');
+					hidePlaceholder();
 				}
 			}
 
